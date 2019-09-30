@@ -27,7 +27,10 @@
 //! of the volatile wrapper types are the same size as their contained values.
 #![no_std]
 
+#[cfg(feature = "zerocopy")] extern crate zerocopy;
+
 use core::ptr;
+#[cfg(feature = "zerocopy")] use zerocopy::FromBytes;
 
 /// A wrapper type around a volatile variable, which allows for volatile reads and writes
 /// to the contained value. The stored type needs to be `Copy`, as volatile reads and writes
@@ -35,6 +38,7 @@ use core::ptr;
 ///
 /// The size of this struct is the same as the size of the contained type.
 #[derive(Debug)]
+#[cfg_attr(feature = "zerocopy", derive(FromBytes))]
 #[repr(transparent)]
 pub struct Volatile<T: Copy>(T);
 
@@ -151,6 +155,8 @@ impl<T: Copy> Clone for Volatile<T> {
 ///
 /// The size of this struct is the same as the contained type.
 #[derive(Debug, Clone)]
+#[repr(transparent)]
+#[cfg_attr(feature = "zerocopy", derive(FromBytes))]
 pub struct ReadOnly<T: Copy>(Volatile<T>);
 
 impl<T: Copy> ReadOnly<T> {
@@ -208,6 +214,8 @@ impl<T: Copy> ReadOnly<T> {
 ///
 /// The size of this struct is the same as the contained type.
 #[derive(Debug, Clone)]
+#[repr(transparent)]
+#[cfg_attr(feature = "zerocopy", derive(FromBytes))]
 pub struct WriteOnly<T: Copy>(Volatile<T>);
 
 impl<T: Copy> WriteOnly<T> {

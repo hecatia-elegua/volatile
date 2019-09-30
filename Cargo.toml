@@ -9,6 +9,8 @@ documentation = "https://docs.rs/volatile"
 repository = "https://github.com/phil-opp/volatile"
 
 [dependencies]
+zerocopy = { version = "0.2.8", optional = true }
 
 [features]
+default = [ "zerocopy", "const_fn" ]
 const_fn = []
