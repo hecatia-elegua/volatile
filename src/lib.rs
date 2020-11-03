@@ -1,4 +1,4 @@
-#![cfg_attr(feature="const_fn", feature(const_fn))]
+#![cfg_attr(feature = "const_fn", feature(const_fn))]
 
 //! Provides wrapper types `Volatile`, `ReadOnly`, `WriteOnly`, `ReadWrite`, which wrap any copy-able type and allows for
 //! volatile memory access to wrapped value. Volatile memory accesses are never optimized away by
@@ -37,7 +37,7 @@ use core::ptr;
 /// take and return copies of the value.
 ///
 /// The size of this struct is the same as the size of the contained type.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 #[cfg_attr(feature = "zerocopy", derive(FromBytes))]
 #[repr(transparent)]
 pub struct Volatile<T: Copy>(T);
@@ -54,7 +54,7 @@ impl<T: Copy> Volatile<T> {
     /// # Panics
     ///
     /// This method never panics.
-    #[cfg(feature="const_fn")]
+    #[cfg(feature = "const_fn")]
     pub const fn new(value: T) -> Volatile<T> {
         Volatile(value)
     }
@@ -70,7 +70,7 @@ impl<T: Copy> Volatile<T> {
     /// # Panics
     ///
     /// This method never panics.
-    #[cfg(not(feature="const_fn"))]
+    #[cfg(not(feature = "const_fn"))]
     pub fn new(value: T) -> Volatile<T> {
         Volatile(value)
     }
@@ -137,7 +137,8 @@ impl<T: Copy> Volatile<T> {
     ///
     /// Ths method never panics.
     pub fn update<F>(&mut self, f: F)
-        where F: FnOnce(&mut T)
+    where
+        F: FnOnce(&mut T),
     {
         let mut value = self.read();
         f(&mut value);
@@ -154,7 +155,7 @@ impl<T: Copy> Clone for Volatile<T> {
 /// A volatile wrapper which only allows read operations.
 ///
 /// The size of this struct is the same as the contained type.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 #[repr(transparent)]
 #[cfg_attr(feature = "zerocopy", derive(FromBytes))]
 pub struct ReadOnly<T: Copy>(Volatile<T>);
@@ -213,7 +214,7 @@ impl<T: Copy> ReadOnly<T> {
 /// A volatile wrapper which only allows write operations.
 ///
 /// The size of this struct is the same as the contained type.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 #[repr(transparent)]
 #[cfg_attr(feature = "zerocopy", derive(FromBytes))]
 pub struct WriteOnly<T: Copy>(Volatile<T>);
@@ -308,7 +309,9 @@ mod tests {
         let volatile_ptr = target_ptr as *mut Volatile<u32>;
 
         // UNSAFE: Safe, as we know the value exists on the stack.
-        unsafe { (*volatile_ptr).write(42u32); }
+        unsafe {
+            (*volatile_ptr).write(42u32);
+        }
 
         assert_eq!(target_value, 42u32);
     }
