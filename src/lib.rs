@@ -1,5 +1,3 @@
-#![cfg_attr(feature = "const_fn", feature(const_fn))]
-
 //! Provides wrapper types `Volatile`, `ReadOnly`, `WriteOnly`, `ReadWrite`, which wrap any copy-able type and allows for
 //! volatile memory access to wrapped value. Volatile memory accesses are never optimized away by
 //! the compiler, and are useful in many low-level systems programming and concurrent contexts.
@@ -26,7 +24,7 @@
 //! and then perform operations on the pointer as usual in a volatile way. This method works as all
 //! of the volatile wrapper types are the same size as their contained values.
 #![no_std]
-
+#![feature(const_fn_trait_bound)]
 #[cfg(feature = "zerocopy")] extern crate zerocopy;
 
 use core::ptr;
@@ -54,24 +52,7 @@ impl<T: Copy> Volatile<T> {
     /// # Panics
     ///
     /// This method never panics.
-    #[cfg(feature = "const_fn")]
     pub const fn new(value: T) -> Volatile<T> {
-        Volatile(value)
-    }
-
-    /// Construct a new volatile instance wrapping the given value.
-    ///
-    /// ```rust
-    /// use volatile::Volatile;
-    ///
-    /// let value = Volatile::new(0u32);
-    /// ```
-    ///
-    /// # Panics
-    ///
-    /// This method never panics.
-    #[cfg(not(feature = "const_fn"))]
-    pub fn new(value: T) -> Volatile<T> {
         Volatile(value)
     }
 
@@ -172,24 +153,7 @@ impl<T: Copy> ReadOnly<T> {
     /// # Panics
     ///
     /// This function never panics.
-    #[cfg(feature = "const_fn")]
     pub const fn new(value: T) -> ReadOnly<T> {
-        ReadOnly(Volatile::new(value))
-    }
-
-    /// Construct a new read-only volatile wrapper wrapping the given value.
-    ///
-    /// ```rust
-    /// use volatile::ReadOnly;
-    ///
-    /// let value = ReadOnly::new(42u32);
-    /// ```
-    ///
-    /// # Panics
-    ///
-    /// This function never panics.
-    #[cfg(not(feature = "const_fn"))]
-    pub fn new(value: T) -> ReadOnly<T> {
         ReadOnly(Volatile::new(value))
     }
 
@@ -231,24 +195,7 @@ impl<T: Copy> WriteOnly<T> {
     /// # Panics
     ///
     /// This function never panics.
-    #[cfg(feature = "const_fn")]
     pub const fn new(value: T) -> WriteOnly<T> {
-        WriteOnly(Volatile::new(value))
-    }
-
-    /// Constructs a new write only volatile wrapper around the given value.
-    ///
-    /// ```rust
-    /// use volatile::WriteOnly;
-    ///
-    /// let value = WriteOnly::new(0u32);
-    /// ```
-    ///
-    /// # Panics
-    ///
-    /// This function never panics.
-    #[cfg(not(feature = "const_fn"))]
-    pub fn new(value: T) -> WriteOnly<T> {
         WriteOnly(Volatile::new(value))
     }
 
