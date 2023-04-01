@@ -24,8 +24,6 @@
 //! and then perform operations on the pointer as usual in a volatile way. This method works as all
 //! of the volatile wrapper types are the same size as their contained values.
 #![no_std]
-#![feature(const_fn_trait_bound)]
-#[cfg(feature = "zerocopy")] extern crate zerocopy;
 
 use core::ptr;
 #[cfg(feature = "zerocopy")] use zerocopy::FromBytes;
